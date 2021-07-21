@@ -84,7 +84,7 @@ public class VaccinationCenter {
                 for (Booth booth : booths) {
                     if (booth.getVaccineName().equals(vaccineName)) {
                         if (!booth.getBooked()) {
-                            patients.add(_getPatientDetails(br, VaccinationType.values()[choice]));
+                            patients.add(_getPatientDetails(br, VaccinationType.values()[choice - 1]));
                             booth.setPatient(patients.get(patients.size() - 1));
                             booth.setBooked(true);
                             booth.setVaccines(booth.getVaccines() - 1);
