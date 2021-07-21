@@ -4,7 +4,7 @@
  * @project COVID-19 VACCINATION CENTER PROGRAM
  * @file VaccinationRequested
  */
-public enum VaccinationRequested {
+public enum VaccinationType {
     AstraZeneca, // booth 0-1
     Sinopharm, // booth 2-3
     Pfizer, // booth 4-5

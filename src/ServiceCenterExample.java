@@ -11,9 +11,9 @@ import java.util.Arrays;
  */
 class BoothInfo {
     public Integer boothNo;
-    public VaccinationRequested vaccine;
+    public VaccinationType vaccine;
 
-    public BoothInfo(Integer boothNo, VaccinationRequested vaccine) {
+    public BoothInfo(Integer boothNo, VaccinationType vaccine) {
         this.boothNo = boothNo;
         this.vaccine = vaccine;
     }
@@ -54,17 +54,17 @@ public class ServiceCenterExample {
                 case 1: {
                     System.out.println("Enter booth number (0-1) or 6 to stop:");
                     boothNum = Integer.parseInt(br.readLine());
-                    return new BoothInfo(boothNum, VaccinationRequested.AstraZeneca);
+                    return new BoothInfo(boothNum, VaccinationType.AstraZeneca);
                 }
                 case 2: {
                     System.out.println("Enter booth number (2-3) or 6 to stop:");
                     boothNum = Integer.parseInt(br.readLine());
-                    return new BoothInfo(boothNum, VaccinationRequested.Sinopharm);
+                    return new BoothInfo(boothNum, VaccinationType.Sinopharm);
                 }
                 case 3: {
                     System.out.println("Enter booth number (4-5) or 6 to stop:");
                     boothNum = Integer.parseInt(br.readLine());
-                    return new BoothInfo(boothNum, VaccinationRequested.Pfizer);
+                    return new BoothInfo(boothNum, VaccinationType.Pfizer);
                 }
                 default: {
                     System.out.println("Your choice is invalid! \nPlease Try Again....");
