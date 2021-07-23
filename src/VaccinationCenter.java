@@ -1,10 +1,7 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author Shevan
@@ -256,11 +253,76 @@ public class VaccinationCenter {
                     case "105":
                     case "SPD": {
                         System.out.println("+--- STORE PROGRAM DATA INTO FILE ---+");
+                        String filePath = String.format("VAC_%s.txt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_hh_mm")));
+                        try {
+                            File create = new File(filePath);
+                            if (create.createNewFile()) {
+                                FileWriter writer = new FileWriter(filePath);
+
+                                for (Booth booth : booths) {
+                                    writer.write(booth.toStore());
+                                }
+                                writer.close();
+                                System.out.println("Successfully wrote to the file.");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     }
                     case "106":
                     case "LPD": {
                         System.out.println("+--- LOAD PROGRAM DATA FROM FILE ---+");
+                        System.out.println("Enter file path: ");
+                        String filePath = br.readLine();
+                        File file = new File(filePath);
+                        Scanner b = new Scanner(file);
+
+                        while (b.hasNextLine()) {
+                            String data = b.nextLine();
+                            if (data.substring(0, data.indexOf('{')).equalsIgnoreCase("Booth")) {
+                                data = data.substring(data.indexOf('{') + 1, data.indexOf('}'));
+                                // System.out.println(data);
+                                String[] split = data.split("\\s");
+                                int boothNo = 0;
+                                for (String s : split) {
+                                    String[] tmp = s.split("=");
+                                    if (tmp[0].equalsIgnoreCase("boothNo")) {
+                                        boothNo = Integer.parseInt(tmp[1].substring(0, tmp[1].lastIndexOf(',')));
+                                    } else {
+                                        if (!booths[boothNo].getBooked()) {
+                                            if (tmp[0].equalsIgnoreCase("patient")) {
+                                                String pTmp;
+                                                if ((pTmp = tmp[1].substring(0, tmp[1].lastIndexOf('{'))).equalsIgnoreCase("Patient")) {
+                                                    System.out.println(pTmp);
+                                                    System.out.println(tmp[1]);
+
+
+//                                                    if (!d.equalsIgnoreCase("null")) {
+//                                                        System.out.println(d);
+//                                                    }
+                                                }
+                                            } else {
+                                                String d = tmp[1].substring(0, tmp[1].lastIndexOf(','));
+                                                if (tmp[0].equalsIgnoreCase("Vaccines")) {
+                                                    booths[boothNo].setVaccines(Integer.parseInt(d));
+                                                }
+
+                                                if (tmp[0].equalsIgnoreCase("booked")) {
+                                                    booths[boothNo].setBooked(Boolean.parseBoolean(d));
+                                                }
+                                            }
+                                        } else {
+                                            System.out.println("\033[0;33mCan't save data to Booth No: " + boothNo + ", it's already booked...\033[0m");
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (Booth s : booths) {
+                            System.out.println(s);
+                        }
                         break;
                     }
                     case "107":

@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * @author Shevan
  * @created 21/07/2021 - 10:28
@@ -49,6 +51,16 @@ public class Booth {
 
     public void setBooked(Boolean booked) {
         this.booked = booked;
+    }
+
+    public String toStore() {
+        return "Booth{" +
+                "boothNo=" + boothNo +
+                ", vaccineName=" + vaccineName +
+                ", patient=" + (Objects.nonNull(patient) ? patient.toStore() : null) +
+                ", Vaccines=" + Vaccines +
+                ", booked=" + booked +
+                ",}\n";
     }
 
     @Override

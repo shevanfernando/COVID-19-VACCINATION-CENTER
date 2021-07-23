@@ -76,6 +76,17 @@ public class Patient implements Comparable<Patient> {
         this.vaccinationType = vaccinationType;
     }
 
+    public String toStore() {
+        return "Patient{" +
+                "firstName=" + firstName +
+                ", surname=" + surname +
+                ", age=" + age +
+                ", city=" + city +
+                ", nic=" + nic +
+                ", vaccinationType=" + vaccinationType +
+                ",}";
+    }
+
     @Override
     public String toString() {
         return "\n+---- PATIENT DETAILS ----+" +
@@ -84,7 +95,7 @@ public class Patient implements Comparable<Patient> {
                 "\nCity= " + city +
                 "\nNIC= " + nic +
                 "\nVaccination Requested= " + vaccinationType +
-                "\n+-------------------------+\n";
+                "\n+-------------------------+";
     }
 
     @Override
