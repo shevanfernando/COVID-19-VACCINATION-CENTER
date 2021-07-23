@@ -13,7 +13,7 @@ public class VaccinationCenter {
     private static Booth[] booths;
     private static List<Patient> patients;
     private static List<Patient> waitingPatients;
-    private static final String WARNING = "\033[0;31m- WARNING : (vaccine stock has reached to minimum level.)\u001B[0m";
+    private static final String WARNING = "\033[0;33m- WARNING : (vaccine stock has reached to minimum level.)\u001B[0m";
 
     private static void initialise() {
         booths = new Booth[6];
@@ -280,48 +280,72 @@ public class VaccinationCenter {
 
                         while (b.hasNextLine()) {
                             String data = b.nextLine();
-                            if (data.substring(0, data.indexOf('{')).equalsIgnoreCase("Booth")) {
-                                data = data.substring(data.indexOf('{') + 1, data.indexOf('}'));
-                                // System.out.println(data);
-                                String[] split = data.split("\\s");
-                                int boothNo = 0;
-                                for (String s : split) {
-                                    String[] tmp = s.split("=");
-                                    if (tmp[0].equalsIgnoreCase("boothNo")) {
-                                        boothNo = Integer.parseInt(tmp[1].substring(0, tmp[1].lastIndexOf(',')));
-                                    } else {
-                                        if (!booths[boothNo].getBooked()) {
-                                            if (tmp[0].equalsIgnoreCase("patient")) {
-                                                String pTmp;
-                                                if ((pTmp = tmp[1].substring(0, tmp[1].lastIndexOf('{'))).equalsIgnoreCase("Patient")) {
-                                                    System.out.println(pTmp);
-                                                    System.out.println(tmp[1]);
+                            int boothNo;
+                            if (!data.isEmpty()) {
+                                if (data.substring(0, data.indexOf('{')).equalsIgnoreCase("Booth")) {
+                                    data = data.substring(data.indexOf('{') + 1, data.lastIndexOf('}'));
+                                    boothNo = Integer.parseInt(data.substring(data.lastIndexOf("boothNo=") + 8, data.indexOf(',')));
+                                    if (!booths[boothNo].getBooked()) {
+                                        Patient tmpPat = null;
 
+                                        if (!data.substring(data.lastIndexOf("patient=") + 8).split(",")[0].equalsIgnoreCase("null")) {
+                                            String dataPt = data.substring(data.lastIndexOf('{') + 1, data.indexOf(",}"));
+                                            tmpPat = new Patient();
+                                            String[] tmpp = dataPt.split(", ");
+                                            for (String t : tmpp) {
+                                                String[] tmpd = t.split("=");
 
-//                                                    if (!d.equalsIgnoreCase("null")) {
-//                                                        System.out.println(d);
-//                                                    }
-                                                }
-                                            } else {
-                                                String d = tmp[1].substring(0, tmp[1].lastIndexOf(','));
-                                                if (tmp[0].equalsIgnoreCase("Vaccines")) {
-                                                    booths[boothNo].setVaccines(Integer.parseInt(d));
-                                                }
+                                                if (tmpd[0].equalsIgnoreCase("firstName"))
+                                                    tmpPat.setFirstName(tmpd[1]);
 
-                                                if (tmp[0].equalsIgnoreCase("booked")) {
-                                                    booths[boothNo].setBooked(Boolean.parseBoolean(d));
-                                                }
+                                                if (tmpd[0].equalsIgnoreCase("surname"))
+                                                    tmpPat.setSurname(tmpd[1]);
+
+                                                if (tmpd[0].equalsIgnoreCase("age"))
+                                                    tmpPat.setAge(Integer.parseInt(tmpd[1]));
+
+                                                if (tmpd[0].equalsIgnoreCase("city"))
+                                                    tmpPat.setCity(tmpd[1]);
+
+                                                if (tmpd[0].equalsIgnoreCase("nic"))
+                                                    tmpPat.setNic(tmpd[1]);
+
+                                                if (tmpd[0].equalsIgnoreCase("vaccinationType"))
+                                                    tmpPat.setVaccinationRequested(VaccinationType.valueOf(tmpd[1]));
                                             }
-                                        } else {
-                                            System.out.println("\033[0;33mCan't save data to Booth No: " + boothNo + ", it's already booked...\033[0m");
-                                            break;
                                         }
+
+                                        if (Objects.nonNull(tmpPat)) {
+                                            patients.add(tmpPat);
+                                            booths[boothNo].setPatient(tmpPat);
+                                        }
+
+                                        data = data.substring(0, data.indexOf(" patient")).concat(data.substring(data.indexOf("},") + 2));
+
+                                        String[] split = data.split("\\s");
+
+                                        for (String s : split) {
+                                            String[] tmp = s.split("=");
+                                            String d = tmp[1].substring(0, tmp[1].lastIndexOf(','));
+                                            if (tmp[0].equalsIgnoreCase("Vaccines")) {
+                                                booths[boothNo].setVaccines(Integer.parseInt(d));
+                                            }
+
+                                            if (tmp[0].equalsIgnoreCase("booked") && Objects.nonNull(tmpPat)) {
+                                                booths[boothNo].setBooked(Boolean.parseBoolean(d));
+                                            } else {
+                                                System.out.print(Boolean.parseBoolean(d) ? "\033[0;33mWARNING : Without patient details, booth can't set as booked!\033[0m\n" : "");
+                                            }
+                                        }
+                                    } else {
+                                        System.out.println("\033[0;33mWARNING : Can't save data to Booth No: " + boothNo + ", it's already booked...\033[0m");
+                                        break;
                                     }
                                 }
                             }
-                        }
-                        for (Booth s : booths) {
-                            System.out.println(s);
+
+                            if (!b.hasNextLine())
+                                System.out.println("Data Load and Save successful...");
                         }
                         break;
                     }
@@ -354,7 +378,8 @@ public class VaccinationCenter {
                     _checkVaccinesStock();
                 }
             }
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             ex.printStackTrace();
         }
     }
