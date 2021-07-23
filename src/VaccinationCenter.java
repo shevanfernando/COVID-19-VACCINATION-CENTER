@@ -2,8 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,11 +15,13 @@ import java.util.List;
 public class VaccinationCenter {
     private static Booth[] booths;
     private static List<Patient> patients;
+    private static List<Patient> waitingPatients;
     private static final String WARNING = "\033[0;31m- WARNING : (vaccine stock has reached to minimum level.)\u001B[0m";
 
     private static void initialise() {
         booths = new Booth[6];
         patients = new ArrayList<>();
+        waitingPatients = new LinkedList<>();
         String vaccination = "";
         for (int x = 0; x < booths.length; x++) {
             switch (x) {
@@ -75,7 +77,12 @@ public class VaccinationCenter {
 
     private static void _addPatient(BufferedReader br) throws IOException {
         while (true) {
-            System.out.println("\n+---- MENU ----+\n" + "1: AstraZeneca\n" + "2: Sinopharm\n" + "3: Pfizer\n" + "4: Exit\n" + "+--------------+\n");
+            System.out.println("\n+---- MENU ----+\n" +
+                    "1: AstraZeneca\n" +
+                    "2: Sinopharm\n" +
+                    "3: Pfizer\n" +
+                    "4: Exit\n" +
+                    "+--------------+\n");
             System.out.println("Enter Vaccine Type : ");
             int choice = Integer.parseInt(br.readLine());
             if (choice < 4) {
@@ -93,6 +100,23 @@ public class VaccinationCenter {
                             break;
                         } else if (booth.getBoothNo() % 2 != 0) {
                             System.out.printf("All the booth depends on %s are booked!%n", VaccinationType.values()[choice - 1]);
+                            System.out.println("We can put you on the waiting list...\n" + "Do you agree with that?: \n" + "Y: Yes\n" + "N: No");
+                            switch (br.readLine().toUpperCase()) {
+                                case "Y": {
+                                    patients.add(_getPatientDetails(br, VaccinationType.values()[choice - 1]));
+                                    waitingPatients.add(patients.get(patients.size() - 1));
+                                    System.out.println("Your name add to waiting list...");
+                                    break;
+                                }
+                                case "N": {
+                                    System.out.println("Ok!");
+                                    break;
+                                }
+                                default: {
+                                    System.out.println("Wrong selection..");
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -105,15 +129,27 @@ public class VaccinationCenter {
         }
     }
 
+    private static void _manageWaitingPatients(Integer boothNo) {
+        for (Patient p : waitingPatients) {
+            if (p.getVaccinationRequested().toString().equals(booths[boothNo].getVaccineName())) {
+                booths[boothNo].setPatient(p);
+                booths[boothNo].setBooked(true);
+                booths[boothNo].setVaccines(booths[boothNo].getVaccines() - 1);
+            }
+        }
+    }
+
     private static void _removePatient(BufferedReader br) throws IOException {
         int boothNum;
         System.out.println("Enter checkout patient booth no : ");
         boothNum = Integer.parseInt(br.readLine());
         try {
-            if (!booths[boothNum].getBooked()) {
+            if (booths[boothNum].getBooked()) {
                 System.out.printf("%s patient checkout successful.%n", booths[boothNum].getPatient().getPatientName());
                 System.out.println("Thank You.\n");
+                patients.remove(booths[boothNum].getPatient());
                 booths[boothNum].setBooked(false);
+                _manageWaitingPatients(boothNum);
             } else {
                 System.out.println("Your selected booth is empty...");
             }
