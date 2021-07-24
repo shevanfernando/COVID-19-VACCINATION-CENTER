@@ -275,77 +275,83 @@ public class VaccinationCenter {
                         System.out.println("+--- LOAD PROGRAM DATA FROM FILE ---+");
                         System.out.println("Enter file path: ");
                         String filePath = br.readLine();
-                        File file = new File(filePath);
-                        Scanner b = new Scanner(file);
 
-                        while (b.hasNextLine()) {
-                            String data = b.nextLine();
-                            int boothNo;
-                            if (!data.isEmpty()) {
-                                if (data.substring(0, data.indexOf('{')).equalsIgnoreCase("Booth")) {
-                                    data = data.substring(data.indexOf('{') + 1, data.lastIndexOf('}'));
-                                    boothNo = Integer.parseInt(data.substring(data.lastIndexOf("boothNo=") + 8, data.indexOf(',')));
-                                    if (!booths[boothNo].getBooked()) {
-                                        Patient tmpPat = null;
+                        try {
+                            File file = new File(filePath);
+                            Scanner b = new Scanner(file);
 
-                                        if (!data.substring(data.lastIndexOf("patient=") + 8).split(",")[0].equalsIgnoreCase("null")) {
-                                            String dataPt = data.substring(data.lastIndexOf('{') + 1, data.indexOf(",}"));
-                                            tmpPat = new Patient();
-                                            String[] tmpp = dataPt.split(", ");
-                                            for (String t : tmpp) {
-                                                String[] tmpd = t.split("=");
+                            while (b.hasNextLine()) {
+                                String data = b.nextLine();
+                                int boothNo;
+                                if (!data.isEmpty()) {
+                                    if (data.substring(0, data.indexOf('{')).equalsIgnoreCase("Booth")) {
+                                        data = data.substring(data.indexOf('{') + 1, data.lastIndexOf('}'));
+                                        boothNo = Integer.parseInt(data.substring(data.lastIndexOf("boothNo=") + 8, data.indexOf(',')));
+                                        if (!booths[boothNo].getBooked()) {
+                                            Patient tmpPat = null;
 
-                                                if (tmpd[0].equalsIgnoreCase("firstName"))
-                                                    tmpPat.setFirstName(tmpd[1]);
+                                            if (!data.substring(data.lastIndexOf("patient=") + 8).split(",")[0].equalsIgnoreCase("null")) {
+                                                String dataPt = data.substring(data.lastIndexOf('{') + 1, data.indexOf(",}"));
+                                                tmpPat = new Patient();
+                                                String[] tmpp = dataPt.split(", ");
+                                                for (String t : tmpp) {
+                                                    String[] tmpd = t.split("=");
 
-                                                if (tmpd[0].equalsIgnoreCase("surname"))
-                                                    tmpPat.setSurname(tmpd[1]);
+                                                    if (tmpd[0].equalsIgnoreCase("firstName"))
+                                                        tmpPat.setFirstName(tmpd[1]);
 
-                                                if (tmpd[0].equalsIgnoreCase("age"))
-                                                    tmpPat.setAge(Integer.parseInt(tmpd[1]));
+                                                    if (tmpd[0].equalsIgnoreCase("surname"))
+                                                        tmpPat.setSurname(tmpd[1]);
 
-                                                if (tmpd[0].equalsIgnoreCase("city"))
-                                                    tmpPat.setCity(tmpd[1]);
+                                                    if (tmpd[0].equalsIgnoreCase("age"))
+                                                        tmpPat.setAge(Integer.parseInt(tmpd[1]));
 
-                                                if (tmpd[0].equalsIgnoreCase("nic"))
-                                                    tmpPat.setNic(tmpd[1]);
+                                                    if (tmpd[0].equalsIgnoreCase("city"))
+                                                        tmpPat.setCity(tmpd[1]);
 
-                                                if (tmpd[0].equalsIgnoreCase("vaccinationType"))
-                                                    tmpPat.setVaccinationRequested(VaccinationType.valueOf(tmpd[1]));
-                                            }
-                                        }
+                                                    if (tmpd[0].equalsIgnoreCase("nic"))
+                                                        tmpPat.setNic(tmpd[1]);
 
-                                        if (Objects.nonNull(tmpPat)) {
-                                            patients.add(tmpPat);
-                                            booths[boothNo].setPatient(tmpPat);
-                                        }
-
-                                        data = data.substring(0, data.indexOf(" patient")).concat(data.substring(data.indexOf("},") + 2));
-
-                                        String[] split = data.split("\\s");
-
-                                        for (String s : split) {
-                                            String[] tmp = s.split("=");
-                                            String d = tmp[1].substring(0, tmp[1].lastIndexOf(','));
-                                            if (tmp[0].equalsIgnoreCase("Vaccines")) {
-                                                booths[boothNo].setVaccines(Integer.parseInt(d));
+                                                    if (tmpd[0].equalsIgnoreCase("vaccinationType"))
+                                                        tmpPat.setVaccinationRequested(VaccinationType.valueOf(tmpd[1]));
+                                                }
                                             }
 
-                                            if (tmp[0].equalsIgnoreCase("booked") && Objects.nonNull(tmpPat)) {
-                                                booths[boothNo].setBooked(Boolean.parseBoolean(d));
-                                            } else {
-                                                System.out.print(Boolean.parseBoolean(d) ? "\033[0;33mWARNING : Without patient details, booth can't set as booked!\033[0m\n" : "");
+                                            if (Objects.nonNull(tmpPat)) {
+                                                patients.add(tmpPat);
+                                                booths[boothNo].setPatient(tmpPat);
                                             }
+
+                                            data = data.substring(0, data.indexOf(" patient")).concat(data.substring(data.indexOf("},") + 2));
+
+                                            String[] split = data.split("\\s");
+
+                                            for (String s : split) {
+                                                String[] tmp = s.split("=");
+                                                String d = tmp[1].substring(0, tmp[1].lastIndexOf(','));
+                                                if (tmp[0].equalsIgnoreCase("Vaccines")) {
+                                                    booths[boothNo].setVaccines(Integer.parseInt(d));
+                                                }
+
+                                                if (tmp[0].equalsIgnoreCase("booked") && Objects.nonNull(tmpPat)) {
+                                                    booths[boothNo].setBooked(Boolean.parseBoolean(d));
+                                                } else {
+                                                    System.out.print(Boolean.parseBoolean(d) ? "\033[0;33mWARNING : Without patient details, booth can't set as booked!\033[0m\n" : "");
+                                                }
+                                            }
+                                        } else {
+                                            System.out.println("\033[0;33mWARNING : Can't save data to Booth No: " + boothNo + ", it's already booked...\033[0m");
+                                            break;
                                         }
-                                    } else {
-                                        System.out.println("\033[0;33mWARNING : Can't save data to Booth No: " + boothNo + ", it's already booked...\033[0m");
-                                        break;
                                     }
                                 }
+
+                                if (!b.hasNextLine())
+                                    System.out.println("Data Load and Save successful...");
                             }
 
-                            if (!b.hasNextLine())
-                                System.out.println("Data Load and Save successful...");
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                         break;
                     }
