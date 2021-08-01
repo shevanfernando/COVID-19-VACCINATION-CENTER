@@ -5,7 +5,7 @@ are as follows;
 
 ### Contributors
 
-1. [Shevan Fernando](`https://github.com/shevanfernando`)
+1. @shevanfernando
 2. [Bimsara De Silva](`https://github.com/bimsaradesilva`)
 3. [Hirushan Fernando](`https://github.com/Ferdenat`)
 
