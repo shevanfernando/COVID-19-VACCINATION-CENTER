@@ -1,11 +1,13 @@
 # Restaurant Reservation
 
-This is the 4th-semester group project of our UOM BIT Degree. In our group has 3 contributors including with me. There are as follows;
+This is the 4th-semester group project of our UOM BIT Degree. In our group has 3 contributors including with me. There
+are as follows;
 
 ### Contributors
-1. [Shevan Fernando](@shevanfernando)
-2. [Bimsara De Silva](@bimsaradesilva)
-3. [Hirushan Fernando](@Ferdenat)
+
+1. [Shevan Fernando](`https://github.com/shevanfernando`)
+2. [Bimsara De Silva](`https://github.com/bimsaradesilva`)
+3. [Hirushan Fernando](`https://github.com/Ferdenat`)
 
 <p align="center">
 <img alt="server" src="https://lh3.googleusercontent.com/3i5fo6Vn-9q91qeEy7RrSOk6ZRvwFNivxH20-oxaDc_VyW0i-M_w9tVlSWVIPPIxjXkO1mt8fo9PFBlOdTzj9mPDDGIsvbwy1FHm8TR_ef0_z8hGyT5vZjTWArTxGlms6WIrNHza=w2400">
@@ -33,6 +35,7 @@ cd restaurant-reservation/restaurant-reservation-server
 npm install
 
 ```
+
 ## MIT License <hr>
 
 Copyright (c) 2021 [Shevan Fernando](`w.k.b.s.t.fernando@gmail.com`)
